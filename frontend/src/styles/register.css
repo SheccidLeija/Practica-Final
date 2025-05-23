@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #003366, #6a0dad);
+}
+
+.register-box {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: left;
+  font-family: 'Poppins', sans-serif;
+}
+
+.register-box h4,
+.register-box p {
+  text-align: center;
+}
+
+.register-box h4 {
+  margin-bottom: 10px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.register-box p {
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.btn-primary {
+  width: 100%;
+  background-color: #003366;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: inherit;
+  font-size: 15px;
+}
+
+.btn-primary:hover {
+  background-color: #002244;
+}
+
+.register-text {
+  font-size: 14px;
+  margin-top: 16px;
+  text-align: center;
+}
+
+.register-message {
+  color: #333;
+  text-align: center;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.login-link {
+  margin-top: 10px;
+}
