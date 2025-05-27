@@ -1,0 +1,45 @@
+.container {
+  padding-top: 32px;
+  padding-bottom: 32px;
+}
+
+/* Encabezado */
+.headerPaper {
+  padding: 32px;
+  margin-bottom: 32px;
+  background: linear-gradient(135deg, rgb(106, 13, 173) 0%, #003366 100%);
+  color: white;
+  border-radius: 32px; /* más curveado */
+}
+
+/* Forzar blanco en todos los textos dentro del header */
+.headerPaper h3,
+.headerPaper h4,
+.headerPaper h5,
+.headerPaper h6,
+.headerPaper p,
+.headerPaper span {
+  color: white !important;
+}
+
+.headerAvatar {
+  background-color: rgba(255, 255, 255, 0.2);
+  width: 56px;
+  height: 56px;
+}
+
+.newCitaButton {
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 12px 24px;
+  color: white;
+}
+
+.newCitaButton:hover {
+  background-color: rgba(67, 11, 108, 0.226);
+}
+
+.dialogAvatar {
+  background-color: #1976d2;
+}
