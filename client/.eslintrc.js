@@ -21,10 +21,11 @@ module.exports = {
     'react-hooks'
   ],
   rules: {
-    'indent': ['error', 2],
-    'linebreak-style': ['error', 'unix'],
-    'quotes': ['error', 'single'],
+    'quotes': ['error', 'single', { 'avoidEscape': true }],
+    'jsx-quotes': ['error', 'prefer-single'],
     'semi': ['error', 'always'],
+    'indent': ['error', 2],
+    'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'warn',
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn'
