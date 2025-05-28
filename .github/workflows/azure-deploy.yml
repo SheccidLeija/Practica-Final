@@ -52,4 +52,23 @@ jobs:
         echo "Deploying to Azure..."
         curl -v -X POST "https://sapitos.scm.azurewebsites.net/api/zipdeploy" \
         -u "${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_USERNAME }}:${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_PASSWORD }}" \
-        --data-binary @"backend.zip" 
+        --data-binary @"backend.zip"
+
+    - name: Configure Environment Variables
+      run: |
+        echo "Configuring environment variables..."
+        SETTINGS_JSON="{
+          \"WEBSITE_NODE_DEFAULT_VERSION\": \"~18\",
+          \"DB_SERVER\": \"sql8020.site4now.net\",
+          \"DB_DATABASE\": \"db_a25c05_sapitos\",
+          \"DB_USER\": \"db_a25c05_sapitos_admin\",
+          \"DB_PASSWORD\": \"momju6-baTnax-rusxyq\",
+          \"DB_ENCRYPT\": \"true\",
+          \"JWT_SECRET\": \"sapitos\",
+          \"ALLOWED_ORIGINS\": \"https://witty-flower-05a792810.6.azurestaticapps.net,https://sapitos.azurewebsites.net\"
+        }"
+        
+        curl -X PUT "https://sapitos.scm.azurewebsites.net/api/settings" \
+        -u "${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_USERNAME }}:${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_PASSWORD }}" \
+        -H "Content-Type: application/json" \
+        --data-raw "$SETTINGS_JSON" 
