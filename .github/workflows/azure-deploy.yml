@@ -13,13 +13,24 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Debug Directory
+      run: |
+        pwd
+        ls -la
+
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
         node-version: '18.x'
 
     - name: Install Dependencies
-      run: npm install
+      working-directory: .
+      run: |
+        echo "Current directory:"
+        pwd
+        echo "Directory contents:"
+        ls -la
+        npm install
 
     - name: Clean App Service (Linux)
       run: |
