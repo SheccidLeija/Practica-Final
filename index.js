@@ -3,6 +3,10 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const sql = require('mssql');
+const mongoose = require('mongoose');
+const authRoutes = require('./routes/auth');
+const auth = require('./middleware/auth');
+
 const app = express();
 
 // Middleware
@@ -25,6 +29,11 @@ const dbConfig = {
         trustServerCertificate: true
     }
 };
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
 // Ruta principal
 app.get('/', (req, res) => {
@@ -93,13 +102,27 @@ app.get('/api/test', (req, res) => {
     res.json({ message: 'API funcionando correctamente' });
 });
 
+// Routes
+app.use('/api/auth', authRoutes);
+
+// Protected route example
+app.get('/api/protected', auth, (req, res) => {
+  res.json({ message: 'This is a protected route', userId: req.userId });
+});
+
 // Todas las demás rutas sirven index.html
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something went wrong!' });
+});
+
 // Puerto dinámico para Azure o 3000 para desarrollo local
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en el puerto ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 }); 
