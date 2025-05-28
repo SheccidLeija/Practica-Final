@@ -13,77 +13,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Zip backend
+    - name: Deploy to Azure
       run: |
-        rm -f backend.zip || true
+        rm -f backend.zip
         zip -r backend.zip * .[^.]* -x "node_modules/" ".env" "tests/"
-
-    - name: Deploy to Azure Web App
-      run: |
         curl -X POST "https://sapitos.scm.azurewebsites.net/api/zipdeploy" \
         --user "$sapitos:1UcGLc06KzkYV2dCNWtn64dUXFudgfXHLZgzboxtnRz4vG1doitgj6NU5eqh" \
-        --data-binary @"backend.zip"
-
-    - name: Wait for deployment
-      run: sleep 30
-
-    - name: Test Application
-      run: |
-        echo "🌐 Testing deployed application..."
-        echo "📍 Main Application: https://sapitos.azurewebsites.net"
-        curl -s -I https://sapitos.azurewebsites.net | head -n 1
-        
-        echo -e "\n📍 Testing API endpoint..."
-        curl -s https://sapitos.azurewebsites.net/api
-
-    - name: Configure Environment Variables
-      run: |
-        echo "Configuring environment variables..."
-        SETTINGS_JSON="{
-          \"WEBSITE_NODE_DEFAULT_VERSION\": \"~18\",
-          \"DB_SERVER\": \"sql8020.site4now.net\",
-          \"DB_DATABASE\": \"db_a25c05_sapitos\",
-          \"DB_USER\": \"db_a25c05_sapitos_admin\",
-          \"DB_PASSWORD\": \"momju6-baTnax-rusxyq\",
-          \"DB_ENCRYPT\": \"true\",
-          \"JWT_SECRET\": \"sapitos\",
-          \"ALLOWED_ORIGINS\": \"https://witty-flower-05a792810.6.azurestaticapps.net,https://sapitos.azurewebsites.net\"
-        }"
-        
-        curl -X PUT "https://sapitos.scm.azurewebsites.net/api/settings" \
-        -u "${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_USERNAME }}:${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_PASSWORD }}" \
-        -H "Content-Type: application/json" \
-        --data-raw "$SETTINGS_JSON"
-
-    - name: Wait for deployment to stabilize
-      run: |
-        echo "Waiting for deployment to stabilize..."
-        sleep 30
-
-    - name: Test Application Endpoints
-      run: |
-        echo "🌐 Application URLs:"
-        echo "📍 Main Application: https://sapitos.azurewebsites.net"
-        echo "📍 API Endpoint: https://sapitos.azurewebsites.net/api"
-        echo "📍 Database Test: https://sapitos.azurewebsites.net/test-db"
-        echo "\nTesting endpoints..."
-        
-        echo "\n🔍 Testing Main Page:"
-        curl -s -o /dev/null -w "Status Code: %{http_code}\n" https://sapitos.azurewebsites.net
-        
-        echo "\n🔍 Testing API Endpoint:"
-        curl -s https://sapitos.azurewebsites.net/api | jq .
-        
-        echo "\n🔍 Testing Database Connection:"
-        curl -s https://sapitos.azurewebsites.net/test-db | jq .
-
-    - name: Create Deployment Summary
-      run: |
-        echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
-        echo "### ✅ Deployment Completed" >> $GITHUB_STEP_SUMMARY
-        echo "The application has been deployed and is ready for use." >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### 🔗 Application URLs" >> $GITHUB_STEP_SUMMARY
-        echo "- [Main Application](https://sapitos.azurewebsites.net)" >> $GITHUB_STEP_SUMMARY
-        echo "- [API Status](https://sapitos.azurewebsites.net/api)" >> $GITHUB_STEP_SUMMARY
-        echo "- [Database Test](https://sapitos.azurewebsites.net/test-db)" >> $GITHUB_STEP_SUMMARY 
+        --data-binary @"backend.zip" 
