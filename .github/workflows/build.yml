@@ -26,10 +26,17 @@ jobs:
         npm install
         npm run build
 
+    - name: Clean wwwroot
+      run: |
+        curl -X POST "https://sapitos.scm.azurewebsites.net/api/command" \
+        --user "$sapitos:1UcGLc06KzkYV2dCNWtn64dUXFudgfXHLZgzboxtnRz4vG1doitgj6NU5eqh" \
+        -H "Content-Type: application/json" \
+        --data '{"command": "rm -rf /home/site/wwwroot/*"}'
+
     - name: Deploy Frontend to Azure
       run: |
         cd frontend/build
-        zip -r ../../frontend.zip *
+        zip -r ../../frontend.zip ./*
         cd ../..
         curl -X POST "https://sapitos.scm.azurewebsites.net/api/zipdeploy" \
         --user "$sapitos:1UcGLc06KzkYV2dCNWtn64dUXFudgfXHLZgzboxtnRz4vG1doitgj6NU5eqh" \
