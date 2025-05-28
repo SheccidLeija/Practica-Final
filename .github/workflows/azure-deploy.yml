@@ -13,10 +13,30 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Deploy to Azure
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18.x'
+
+    - name: Build Frontend
+      run: |
+        cd frontend
+        npm install
+        npm run build
+        cd ..
+
+    - name: Install Backend Dependencies
+      run: |
+        npm install
+
+    - name: Prepare Deploy Package
       run: |
         rm -f backend.zip
-        zip -r backend.zip * .[^.]* -x "node_modules/" ".env" "tests/"
+        cp -r frontend/build/* .
+        zip -r backend.zip * .[^.]* -x "frontend/*" "node_modules/*" ".env" "tests/*"
+
+    - name: Deploy to Azure Web App
+      run: |
         curl -X POST "https://sapitos.scm.azurewebsites.net/api/zipdeploy" \
         --user "$sapitos:1UcGLc06KzkYV2dCNWtn64dUXFudgfXHLZgzboxtnRz4vG1doitgj6NU5eqh" \
         --data-binary @"backend.zip" 

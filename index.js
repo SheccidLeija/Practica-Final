@@ -1,8 +1,8 @@
 require('dotenv').config();
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const sql = require('mssql');
-const path = require('path');
 const app = express();
 
 // Middleware
@@ -10,7 +10,9 @@ app.use(cors({
     origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : '*'
 }));
 app.use(express.json());
-app.use(express.static('public'));
+
+// Servir archivos estáticos del frontend
+app.use(express.static(path.join(__dirname, 'frontend/build')));
 
 // Configuración de la base de datos
 const dbConfig = {
@@ -24,79 +26,43 @@ const dbConfig = {
     }
 };
 
-// Ruta principal que sirve el HTML
+// Ruta principal
 app.get('/', (req, res) => {
     res.send(`
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Sapitos - Backend</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 0;
-                padding: 20px;
-                background: #f0f0f0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-            }
-            .container {
-                background: white;
-                padding: 30px;
-                border-radius: 10px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                max-width: 600px;
-                width: 100%;
-            }
-            h1 {
-                color: #333;
-                margin-bottom: 20px;
-            }
-            .status {
-                padding: 15px;
-                background: #e8f5e9;
-                border-radius: 5px;
-                margin-bottom: 20px;
-            }
-            .endpoints {
-                background: #f5f5f5;
-                padding: 15px;
-                border-radius: 5px;
-            }
-            .endpoint {
-                margin-bottom: 10px;
-            }
-            .success {
-                color: #2e7d32;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>Backend de Sapitos</h1>
-            <div class="status">
-                <h2 class="success">✅ Servidor Activo</h2>
-                <p>El servidor está funcionando correctamente.</p>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Sapitos App</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    padding: 20px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 100vh;
+                    background-color: #f0f2f5;
+                }
+                .container {
+                    background: white;
+                    padding: 30px;
+                    border-radius: 10px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    text-align: center;
+                }
+                h1 {
+                    color: #1a73e8;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>¡Bienvenido a Sapitos!</h1>
+                <p>La aplicación está funcionando correctamente.</p>
             </div>
-            <div class="endpoints">
-                <h3>Endpoints disponibles:</h3>
-                <div class="endpoint">
-                    <strong>GET /</strong> - Página principal
-                </div>
-                <div class="endpoint">
-                    <strong>GET /api</strong> - Información de la API
-                </div>
-                <div class="endpoint">
-                    <strong>GET /test-db</strong> - Prueba de conexión a la base de datos
-                </div>
-            </div>
-        </div>
-    </body>
-    </html>
+        </body>
+        </html>
     `);
 });
 
@@ -122,9 +88,13 @@ app.get('/test-db', async (req, res) => {
     }
 });
 
+// Todas las rutas no manejadas servirán el index.html
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'frontend/build', 'index.html'));
+});
+
 // Puerto dinámico para Azure o 3000 para desarrollo local
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);
 }); 
