@@ -15,20 +15,20 @@ jobs:
 
     - name: Clean App Service (Linux)
       run: |
-        curl -X POST "https://${{ secrets.AZURE_WEBAPP_BACKEND_NAME }}.scm.azurewebsites.net/api/command" \
-        -u ${{ secrets.AZURE_WEBAPP_BACKEND_PUBLISH_PROFILE_solouserpwd }} \
+        curl -X POST "https://sapitos.scm.azurewebsites.net/api/command" \
+        --user "$sapitos:1UcGLc06KzkYV2dCNWtn64dUXFudgfXHLZgzboxtnRz4vG1doitgj6NU5eqh" \
         -H "Content-Type: application/json" \
         --data '{"command": "rm -rf /home/site/wwwroot/*"}'
 
     - name: Zip backend
       run: |
-        rm -f backend.zip
-        zip -r backend.zip * .[^.]* -x "node_modules/*" ".env" "tests/*"
+        rm backend.zip
+        zip -r backend.zip * .[^.]* -x "node_modules/" ".env" "tests/"
 
     - name: Deploy to Azure Web App via zipdeploy
       run: |
-        curl -X POST "https://${{ secrets.AZURE_WEBAPP_BACKEND_NAME }}.scm.azurewebsites.net/api/zipdeploy" \
-        -u ${{ secrets.AZURE_WEBAPP_BACKEND_PUBLISH_PROFILE_solouserpwd }} \
+        curl -X POST "https://sapitos.scm.azurewebsites.net/api/zipdeploy" \
+        --user "$sapitos:1UcGLc06KzkYV2dCNWtn64dUXFudgfXHLZgzboxtnRz4vG1doitgj6NU5eqh" \
         --data-binary @"backend.zip"
 
     - name: Configure Environment Variables
