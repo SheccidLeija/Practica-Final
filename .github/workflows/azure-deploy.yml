@@ -1,100 +1,50 @@
-name: Deploy Backend and Frontend to Azure
+name: Deploy Backend to Azure
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v2
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
       with:
-        node-version: '18'
+        node-version: '18.x'
 
-    - name: Cache backend dependencies
-      uses: actions/cache@v3
-      with:
-        path: server/node_modules
-        key: ${{ runner.os }}-npm-backend-${{ hashFiles('server/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-npm-backend-
-
-    - name: Cache frontend dependencies
-      uses: actions/cache@v3
-      with:
-        path: client/node_modules
-        key: ${{ runner.os }}-npm-frontend-${{ hashFiles('client/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-npm-frontend-
-
-    - name: Install backend dependencies
+    - name: Install Backend Dependencies
       run: |
-        cd server
-        npm ci
+        npm install
 
-    - name: Install frontend dependencies
+    - name: Clean wwwroot
       run: |
-        cd client
-        npm ci
+        curl -X POST "https://sapitos.scm.azurewebsites.net/api/command" \
+        --user "$sapitos:1UcGLc06KzkYV2dCNWtn64dUXFudgfXHLZgzboxtnRz4vG1doitgj6NU5eqh" \
+        -H "Content-Type: application/json" \
+        --data '{"command": "rm -rf /home/site/wwwroot/*"}'
 
-    - name: Build frontend
+    - name: Prepare and Deploy Backend
       run: |
-        cd client
-        npm run build
-
-    - name: Prepare backend for deployment
-      run: |
-        # Copy frontend build to server public folder
-        mkdir -p server/public
-        cp -r client/build/* server/public/
+        # Crear directorio temporal para el backend
+        mkdir -p temp_backend
+        cp package.json temp_backend/
+        cp index.js temp_backend/
+        cp -r routes temp_backend/ || true
+        cp -r models temp_backend/ || true
+        cp -r controllers temp_backend/ || true
         
-        # Create web.config for Azure App Service (Node.js)
-        cat > server/web.config << 'EOF'
-        <?xml version="1.0" encoding="utf-8"?>
-        <configuration>
-          <system.webServer>
-            <handlers>
-              <add name="iisnode" path="index.js" verb="*" modules="iisnode"/>
-            </handlers>
-            <rewrite>
-              <rules>
-                <rule name="StaticContent">
-                  <action type="Rewrite" url="public{REQUEST_URI}"/>
-                </rule>
-                <rule name="DynamicContent">
-                  <conditions>
-                    <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="True"/>
-                  </conditions>
-                  <action type="Rewrite" url="index.js"/>
-                </rule>
-              </rules>
-            </rewrite>
-            <iisnode watchedFiles="web.config;*.js"/>
-          </system.webServer>
-        </configuration>
-        EOF
-
-    - name: Clean previous deployment files
-      run: |
-        rm -f backend.zip
-
-    - name: Zip backend
-      run: |
-        zip -r backend.zip server -x "server/node_modules/*"
-
-    - name: Deploy to Azure Web App via zipdeploy
-      run: |
-        curl -X POST "https://${{ secrets.AZURE_WEBAPP_BACKEND_NAME }}.scm.azurewebsites.net/api/zipdeploy" \
-        -u ${{ secrets.AZURE_WEBAPP_BACKEND_PUBLISH_PROFILE }} \
-        --data-binary @"backend.zip"
-
-    - name: Verify deployment
-      run: |
-        echo "Deployment completed. Please check your Azure Web App at: https://${{ secrets.AZURE_WEBAPP_BACKEND_NAME }}"
+        # Crear el zip del backend
+        cd temp_backend
+        zip -r ../backend.zip .
+        cd ..
+        
+        # Desplegar a Azure
+        curl -X POST "https://sapitos.scm.azurewebsites.net/api/zipdeploy" \
+        --user "$sapitos:1UcGLc06KzkYV2dCNWtn64dUXFudgfXHLZgzboxtnRz4vG1doitgj6NU5eqh" \
+        --data-binary @"backend.zip" 
