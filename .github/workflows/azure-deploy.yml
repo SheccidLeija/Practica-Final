@@ -17,10 +17,22 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: |
-          server/package-lock.json
-          client/package-lock.json
+
+    - name: Cache backend dependencies
+      uses: actions/cache@v3
+      with:
+        path: server/node_modules
+        key: ${{ runner.os }}-npm-backend-${{ hashFiles('server/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-npm-backend-
+
+    - name: Cache frontend dependencies
+      uses: actions/cache@v3
+      with:
+        path: client/node_modules
+        key: ${{ runner.os }}-npm-frontend-${{ hashFiles('client/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-npm-frontend-
 
     - name: Install backend dependencies
       run: |
