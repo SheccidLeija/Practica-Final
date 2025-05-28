@@ -31,6 +31,18 @@ jobs:
         --user "$sapitos:1UcGLc06KzkYV2dCNWtn64dUXFudgfXHLZgzboxtnRz4vG1doitgj6NU5eqh" \
         --data-binary @"backend.zip"
 
+    - name: Wait for deployment
+      run: sleep 30
+
+    - name: Test Application
+      run: |
+        echo "🌐 Testing deployed application..."
+        echo "📍 Main Application: https://sapitos.azurewebsites.net"
+        curl -s -I https://sapitos.azurewebsites.net | head -n 1
+        
+        echo -e "\n📍 Testing API endpoint..."
+        curl -s https://sapitos.azurewebsites.net/api
+
     - name: Configure Environment Variables
       run: |
         echo "Configuring environment variables..."
