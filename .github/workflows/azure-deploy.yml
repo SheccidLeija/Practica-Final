@@ -22,17 +22,6 @@ jobs:
       run: |
         npm install
 
-    - name: Prepare Deploy Package
-      run: |
-        rm -f backend.zip
-        zip -r backend.zip * .[^.]* -x "frontend/*" "node_modules/*" ".env" "tests/*"
-
-    - name: Deploy Backend to Azure
-      run: |
-        curl -X POST "https://sapitos.scm.azurewebsites.net/api/zipdeploy" \
-        --user "$sapitos:1UcGLc06KzkYV2dCNWtn64dUXFudgfXHLZgzboxtnRz4vG1doitgj6NU5eqh" \
-        --data-binary @"backend.zip"
-
     - name: Configure Environment Variables
       run: |
         echo "Configuring environment variables..."
@@ -49,4 +38,31 @@ jobs:
         curl -X POST "https://sapitos.scm.azurewebsites.net/api/settings" \
         --user "$sapitos:1UcGLc06KzkYV2dCNWtn64dUXFudgfXHLZgzboxtnRz4vG1doitgj6NU5eqh" \
         -H "Content-Type: application/json" \
-        --data-raw "$SETTINGS_JSON" 
+        --data-raw "$SETTINGS_JSON"
+
+    - name: Clean wwwroot
+      run: |
+        curl -X POST "https://sapitos.scm.azurewebsites.net/api/command" \
+        --user "$sapitos:1UcGLc06KzkYV2dCNWtn64dUXFudgfXHLZgzboxtnRz4vG1doitgj6NU5eqh" \
+        -H "Content-Type: application/json" \
+        --data '{"command": "rm -rf /home/site/wwwroot/*"}'
+
+    - name: Prepare and Deploy Backend
+      run: |
+        # Crear directorio temporal para el backend
+        mkdir -p temp_backend
+        cp package.json temp_backend/
+        cp index.js temp_backend/
+        cp -r routes temp_backend/ || true
+        cp -r models temp_backend/ || true
+        cp -r controllers temp_backend/ || true
+        
+        # Crear el zip del backend
+        cd temp_backend
+        zip -r ../backend.zip .
+        cd ..
+        
+        # Desplegar a Azure
+        curl -X POST "https://sapitos.scm.azurewebsites.net/api/zipdeploy" \
+        --user "$sapitos:1UcGLc06KzkYV2dCNWtn64dUXFudgfXHLZgzboxtnRz4vG1doitgj6NU5eqh" \
+        --data-binary @"backend.zip" 
