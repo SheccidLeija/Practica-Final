@@ -13,45 +13,22 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Debug Directory
-      run: |
-        pwd
-        ls -la
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '18.x'
-
-    - name: Install Dependencies
-      working-directory: .
-      run: |
-        echo "Current directory:"
-        pwd
-        echo "Directory contents:"
-        ls -la
-        npm install
-
     - name: Clean App Service (Linux)
       run: |
-        echo "Cleaning App Service..."
-        curl -v -X POST "https://sapitos.scm.azurewebsites.net/api/command" \
-        -u "${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_USERNAME }}:${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_PASSWORD }}" \
+        curl -X POST "https://${{ secrets.AZURE_WEBAPP_BACKEND_NAME }}.scm.azurewebsites.net/api/command" \
+        -u ${{ secrets.AZURE_WEBAPP_BACKEND_PUBLISH_PROFILE_solouserpwd }} \
         -H "Content-Type: application/json" \
         --data '{"command": "rm -rf /home/site/wwwroot/*"}'
 
-    - name: Create deployment package
+    - name: Zip backend
       run: |
-        echo "Creating deployment package..."
         rm -f backend.zip
         zip -r backend.zip * .[^.]* -x "node_modules/*" ".env" "tests/*"
-        ls -lh backend.zip
 
-    - name: Deploy to Azure
+    - name: Deploy to Azure Web App via zipdeploy
       run: |
-        echo "Deploying to Azure..."
-        curl -v -X POST "https://sapitos.scm.azurewebsites.net/api/zipdeploy" \
-        -u "${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_USERNAME }}:${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_PASSWORD }}" \
+        curl -X POST "https://${{ secrets.AZURE_WEBAPP_BACKEND_NAME }}.scm.azurewebsites.net/api/zipdeploy" \
+        -u ${{ secrets.AZURE_WEBAPP_BACKEND_PUBLISH_PROFILE_solouserpwd }} \
         --data-binary @"backend.zip"
 
     - name: Configure Environment Variables
