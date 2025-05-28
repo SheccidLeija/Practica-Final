@@ -21,11 +21,11 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: server/package-lock.json
 
     - name: Install backend dependencies
-      run: npm ci
+      run: |
+        npm install
+        npm ci || npm install
 
     - name: Run backend lint
       run: npm run lint
@@ -50,11 +50,11 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: client/package-lock.json
 
     - name: Install frontend dependencies
-      run: npm ci
+      run: |
+        npm install
+        npm ci || npm install
 
     - name: Run frontend lint
       run: npm run lint
