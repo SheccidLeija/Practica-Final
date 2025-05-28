@@ -13,19 +13,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Clean App Service (Linux)
-      run: |
-        curl -X POST "https://sapitos.scm.azurewebsites.net/api/command" \
-        --user "$sapitos:1UcGLc06KzkYV2dCNWtn64dUXFudgfXHLZgzboxtnRz4vG1doitgj6NU5eqh" \
-        -H "Content-Type: application/json" \
-        --data '{"command": "rm -rf /home/site/wwwroot/*"}'
-
     - name: Zip backend
       run: |
         rm -f backend.zip || true
         zip -r backend.zip * .[^.]* -x "node_modules/" ".env" "tests/"
 
-    - name: Deploy to Azure Web App via zipdeploy
+    - name: Deploy to Azure Web App
       run: |
         curl -X POST "https://sapitos.scm.azurewebsites.net/api/zipdeploy" \
         --user "$sapitos:1UcGLc06KzkYV2dCNWtn64dUXFudgfXHLZgzboxtnRz4vG1doitgj6NU5eqh" \
