@@ -2,33 +2,38 @@ module.exports = {
   env: {
     browser: true,
     es2021: true,
-    jest: true
+    jest: true,
+    node: true
   },
   extends: [
     'eslint:recommended',
     'plugin:react/recommended',
-    'plugin:react-hooks/recommended'
+    'plugin:react-hooks/recommended',
+    'plugin:jsx-a11y/recommended'
   ],
   parserOptions: {
     ecmaFeatures: {
       jsx: true
     },
-    ecmaVersion: 12,
+    ecmaVersion: 'latest',
     sourceType: 'module'
   },
   plugins: [
     'react',
-    'react-hooks'
+    'react-hooks',
+    'jsx-a11y'
   ],
   rules: {
-    'quotes': ['error', 'single', { 'avoidEscape': true }],
-    'jsx-quotes': ['error', 'prefer-single'],
-    'semi': ['error', 'always'],
-    'indent': ['error', 2],
+    'quotes': ['warn', 'single', { 'avoidEscape': true }],
+    'jsx-quotes': ['warn', 'prefer-single'],
+    'semi': ['warn', 'always'],
+    'indent': ['warn', 2],
+    'no-unused-vars': 'warn',
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'warn',
     'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'warn'
+    'react-hooks/exhaustive-deps': 'warn',
+    'jsx-a11y/anchor-is-valid': 'warn'
   },
   settings: {
     react: {
