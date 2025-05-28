@@ -11,8 +11,8 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Servir archivos estáticos del frontend
-app.use(express.static(path.join(__dirname, 'public')));
+// Servir archivos estáticos desde el directorio raíz
+app.use(express.static(path.join(__dirname)));
 
 // Configuración de la base de datos
 const dbConfig = {
@@ -88,9 +88,14 @@ app.get('/test-db', async (req, res) => {
     }
 });
 
-// Todas las rutas no manejadas servirán el index.html
+// Rutas API aquí
+app.get('/api/test', (req, res) => {
+    res.json({ message: 'API funcionando correctamente' });
+});
+
+// Todas las demás rutas sirven index.html
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Puerto dinámico para Azure o 3000 para desarrollo local
