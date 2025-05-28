@@ -1,0 +1,36 @@
+name: Build and Deploy Frontend
+
+on:
+  workflow_run:
+    workflows: ["Deploy Backend to Azure"]
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18.x'
+
+    - name: Build Frontend
+      run: |
+        cd frontend
+        npm install
+        npm run build
+
+    - name: Deploy Frontend to Azure
+      run: |
+        cd frontend/build
+        zip -r ../../frontend.zip *
+        cd ../..
+        curl -X POST "https://sapitos.scm.azurewebsites.net/api/zipdeploy" \
+        --user "$sapitos:1UcGLc06KzkYV2dCNWtn64dUXFudgfXHLZgzboxtnRz4vG1doitgj6NU5eqh" \
+        --data-binary @"frontend.zip" 

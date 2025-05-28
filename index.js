@@ -12,7 +12,7 @@ app.use(cors({
 app.use(express.json());
 
 // Servir archivos estáticos del frontend
-app.use(express.static(path.join(__dirname, 'frontend/build')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Configuración de la base de datos
 const dbConfig = {
@@ -90,7 +90,7 @@ app.get('/test-db', async (req, res) => {
 
 // Todas las rutas no manejadas servirán el index.html
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend/build', 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Puerto dinámico para Azure o 3000 para desarrollo local
